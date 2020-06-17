@@ -1,68 +1,48 @@
 package banking;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.List;
 import java.util.Scanner;
 
 public class BaseBank {
-    private final Random random = new Random();
     private final Scanner scanner = new Scanner(System.in);
-    private final ArrayList<String> accounts = new ArrayList<>();
-    private final ArrayList<String> PINforAccounts = new ArrayList<>();
+    private final List<Account> accounts = new ArrayList<>();
 
     private void createAccount() {
         System.out.println("Your card has been created");
+        Account account = new Account();
+        accounts.add(account);
         System.out.println("Your card number:");
-        StringBuilder numberOfCard = new StringBuilder();
-        StringBuilder PINforCard = new StringBuilder();
-        numberOfCard.append(400000);
-        for (int i = 0; i < 9; i++) {
-            numberOfCard.append(random.nextInt(9));
-        }
-        numberOfCard.append(5);
-        accounts.add(numberOfCard.toString());
-        System.out.println(numberOfCard.toString());
+        System.out.println(account.getCardNumber());
         System.out.println("Your card PIN:");
-        for (int i = 0; i < 4; i++) {
-            PINforCard.append(random.nextInt(9));
-        }
-        PINforAccounts.add(PINforCard.toString());
-        System.out.println(PINforCard.toString());
+        System.out.println(account.getPIN());
     }
 
     private int logAccount() {
         int checkError = 0;
         System.out.println("Enter your card number:");
-        String checkCardNumber = scanner.next();
+        String cardNumber = scanner.next();
         System.out.println("Enter your PIN:");
-        String checkPIN = scanner.next();
-        boolean isExistAccount = false, isExistPIN = false;
-        for (String account : accounts) {
-            if (checkCardNumber.equals(account)) {
-                isExistAccount = true;
-                break;
+        String pinCode = scanner.next();
+        Account account = null;
+        for (Account a : accounts) {
+            if (a.getCardNumber().equals(cardNumber) && a.getPIN().equals(pinCode)) {
+                account = a;
             }
         }
-        for (String piNforAccount : PINforAccounts) {
-            if (checkPIN.equals(piNforAccount)) {
-                isExistPIN = true;
-                break;
-            }
-        }
-        if (!isExistAccount || !isExistPIN) {
+        if (account == null) {
             System.out.println("Wrong card number or PIN!");
-        }
-        else {
+        } else {
             System.out.println("You have successfully logged in!");
             boolean flag = true;
             while (flag) {
-            System.out.println("1. Balance");
-            System.out.println("2. Log out");
-            System.out.println("0. Exit");
-            int choose = scanner.nextInt();
+                System.out.println("1. Balance");
+                System.out.println("2. Log out");
+                System.out.println("0. Exit");
+                int choose = scanner.nextInt();
                 switch (choose) {
                     case 1:
-                        System.out.println("Balance: 0");
+                        System.out.println("Balance: " + account.getBalance());
                         break;
                     case 2:
                         System.out.println("You have successfully logged out!");
