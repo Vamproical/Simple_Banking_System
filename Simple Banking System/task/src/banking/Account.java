@@ -6,7 +6,7 @@ public class Account {
     private final Random random = new Random();
     private String cardNumber;
     private String PIN;
-    private int balance;
+    private final int balance;
 
     public Account() {
         generateCardNumber();
@@ -22,13 +22,32 @@ public class Account {
         PIN = PINforCard.toString();
     }
 
+    private int luhnAlgorith(String number) {
+        int lastDigit;
+        int sumNumbers = 0;
+        boolean isSecond = true;
+        for (int i = number.length() - 1; i >= 0; i--) {
+            int digits = number.charAt(i) - '0';
+            if (isSecond) {
+                digits *= 2;
+            }
+            if (digits > 9) {
+                digits -= 9;
+            }
+            isSecond = !isSecond;
+            sumNumbers += digits;
+        }
+        lastDigit = (sumNumbers * 9) % 10;
+        return lastDigit;
+    }
+
     private void generateCardNumber() {
         StringBuilder numberOfCard = new StringBuilder();
         numberOfCard.append(400000);
         for (int i = 0; i < 9; i++) {
             numberOfCard.append(random.nextInt(9));
         }
-        numberOfCard.append(5);
+        numberOfCard.append(luhnAlgorith(numberOfCard.toString()));
         cardNumber = numberOfCard.toString();
     }
 
