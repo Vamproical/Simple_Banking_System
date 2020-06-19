@@ -9,6 +9,7 @@ public class Account {
     private final int balance;
 
     public Account() {
+
         generateCardNumber();
         generatePIN();
         balance = 0;

@@ -7,11 +7,20 @@ import java.util.Scanner;
 public class BaseBank {
     private final Scanner scanner = new Scanner(System.in);
     private final List<Account> accounts = new ArrayList<>();
+    private final DataBase dataBase = new DataBase();
+    private final String dataBaseName;
+    private int i = 1;
+
+    public BaseBank(String dataBaseName) {
+        this.dataBaseName = dataBaseName;
+    }
 
     private void createAccount() {
         System.out.println("Your card has been created");
         Account account = new Account();
         accounts.add(account);
+        dataBase.insert(i, account.getCardNumber(), account.getPIN());
+        i++;
         System.out.println("Your card number:");
         System.out.println(account.getCardNumber());
         System.out.println("Your card PIN:");
