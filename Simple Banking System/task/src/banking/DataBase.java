@@ -1,62 +1,86 @@
 package banking;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 public class DataBase {
-    String nameDataBase = "card.s3db";
+    //String nameDataBase = "card.s3db";
+    private final DataSource dataSource;
 
-    public DataBase() {
+    public DataBase(DataSource dataSource) {
+        this.dataSource = dataSource;
         createNewTable();
     }
 
     public void createNewTable() {
-        String url = "jdbc:sqlite:";
-
-        // SQL statement for creating a new table
-        String sql = "CREATE TABLE card (\n"
-                + "	id INTEGER,\n"
-                + "	number TEXT,\n"
-                + "	pin TEXT,\n"
-                + "	balance INTEGER DEFAULT 0\n"
-                + ");";
-        try (Connection conn = DriverManager.getConnection(url + nameDataBase);
-             Statement stmt = conn.createStatement()) {
-            // create a new table
-            stmt.execute(sql);
+        try (final Connection connection = dataSource.getConnection();
+             final Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("DROP TABLE IF EXISTS card");
+            stmt.executeUpdate("CREATE TABLE card ("
+                    + " id INTEGER,"
+                    + " number TEXT,"
+                    + " pin TEXT,"
+                    + " balance INTEGER DEFAULT 0"
+                    + ")");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error while creating table " + e.getMessage());
         }
     }
 
     private Connection connect() {
-        // SQLite connection string
-        String url = "jdbc:sqlite:";
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(url + nameDataBase);
+            conn = dataSource.getConnection();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return conn;
     }
 
-    /**
-     * Insert a new row into the card table
-     *
-     * @param number
-     * @param pin
-     */
-    public void insert(int i, String number, String pin) {
-        String sql = "INSERT INTO card(id,number,pin) VALUES(?,?,?)";
+    public void insert(Account account) {
+        String sql = "INSERT INTO card(number,pin,balance) VALUES(?,?,?)";
 
         try (Connection conn = this.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, i);
-            pstmt.setString(2, number);
-            pstmt.setString(3, pin);
+            pstmt.setString(1, account.getCardNumber());
+            pstmt.setString(2, account.getPIN());
+            pstmt.setInt(3, (int) account.getBalance());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void deleteCard(String cardNum) {
+        try (final Connection connection = dataSource.getConnection();
+             final PreparedStatement stmt = connection.prepareStatement("DELETE FROM card WHERE number = ?")) {
+
+            stmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error reading from file");
+            throw new RuntimeException("Error while finding element");
+        }
+    }
+
+    public Account findByNumber(String number) {
+        try (final Connection connection = dataSource.getConnection();
+             final PreparedStatement stmt = connection.prepareStatement("SELECT * FROM card WHERE number=?")) {
+
+            stmt.setString(1, number);
+
+            try (final ResultSet res = stmt.executeQuery()) {
+                if (res.next()) {
+                    final String pin = res.getString("pin");
+                    final double balance = res.getDouble("balance");
+                    return new Account(number, pin, balance);
+                } else {
+                    return null;
+                }
+
+            }
+        } catch (SQLException e) {
+            System.out.println("Error reading from file");
+            throw new RuntimeException("Error while finding element");
         }
     }
 }

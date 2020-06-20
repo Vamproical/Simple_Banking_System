@@ -6,13 +6,18 @@ public class Account {
     private final Random random = new Random();
     private String cardNumber;
     private String PIN;
-    private final int balance;
+    private final double balance;
 
     public Account() {
-
         generateCardNumber();
         generatePIN();
         balance = 0;
+    }
+
+    public Account(String number, String pin, double balance) {
+        this.cardNumber = number;
+        this.PIN = pin;
+        this.balance = balance;
     }
 
     private void generatePIN() {
@@ -60,7 +65,7 @@ public class Account {
         return PIN;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 

@@ -1,26 +1,26 @@
 package banking;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.sqlite.SQLiteDataSource;
+
 import java.util.Scanner;
 
 public class BaseBank {
+    SQLiteDataSource sqLiteDataSource = new SQLiteDataSource();
     private final Scanner scanner = new Scanner(System.in);
-    private final List<Account> accounts = new ArrayList<>();
-    private final DataBase dataBase = new DataBase();
     private final String dataBaseName;
-    private int i = 1;
+    private final DataBase dataBase;
+    Account account = new Account();
 
     public BaseBank(String dataBaseName) {
         this.dataBaseName = dataBaseName;
+        sqLiteDataSource.setUrl("jdbc:sqlite:" + dataBaseName);
+        dataBase = new DataBase(sqLiteDataSource);
     }
 
     private void createAccount() {
         System.out.println("Your card has been created");
         Account account = new Account();
-        accounts.add(account);
-        dataBase.insert(i, account.getCardNumber(), account.getPIN());
-        i++;
+        dataBase.insert(account);
         System.out.println("Your card number:");
         System.out.println(account.getCardNumber());
         System.out.println("Your card PIN:");
@@ -33,27 +33,27 @@ public class BaseBank {
         String cardNumber = scanner.next();
         System.out.println("Enter your PIN:");
         String pinCode = scanner.next();
-        Account account = null;
-        for (Account a : accounts) {
-            if (a.getCardNumber().equals(cardNumber) && a.getPIN().equals(pinCode)) {
-                account = a;
-            }
-        }
-        if (account == null) {
+        account = dataBase.findByNumber(cardNumber);
+        if (account == null || !pinCode.equals(account.getPIN())) {
             System.out.println("Wrong card number or PIN!");
         } else {
             System.out.println("You have successfully logged in!");
             boolean flag = true;
             while (flag) {
                 System.out.println("1. Balance");
-                System.out.println("2. Log out");
+                System.out.println("2. Add income");
+                System.out.println("3. Do transfer");
+                System.out.println("4. Close account");
+                System.out.println("5. Log out");
                 System.out.println("0. Exit");
                 int choose = scanner.nextInt();
                 switch (choose) {
                     case 1:
                         System.out.println("Balance: " + account.getBalance());
                         break;
-                    case 2:
+                    case 4:
+
+                    case 5:
                         System.out.println("You have successfully logged out!");
                         flag = false;
                         break;
