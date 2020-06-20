@@ -47,6 +47,26 @@ public class Account {
         return lastDigit;
     }
 
+    public boolean checkLuhnAlgorithm(String number) {
+        int nDigits = number.length();
+
+        int nSum = 0;
+        boolean isSecond = false;
+        for (int i = nDigits - 1; i >= 0; i--) {
+
+            int d = number.charAt(i) - '0';
+
+            if (isSecond == true)
+                d = d * 2;
+
+            nSum += d / 10;
+            nSum += d % 10;
+
+            isSecond = !isSecond;
+        }
+        return (nSum % 10 == 0);
+    }
+
     private void generateCardNumber() {
         StringBuilder numberOfCard = new StringBuilder();
         numberOfCard.append(400000);

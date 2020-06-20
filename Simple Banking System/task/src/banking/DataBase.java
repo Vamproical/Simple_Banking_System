@@ -51,6 +51,17 @@ public class DataBase {
         }
     }
 
+    public void updateBalance(String cardNum, int income) {
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM card WHERE number=?")) {
+            pstmt.setString(1, cardNum);
+            pstmt.setInt(3, income);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void deleteCard(String cardNum) {
         try (final Connection connection = dataSource.getConnection();
              final PreparedStatement stmt = connection.prepareStatement("DELETE FROM card WHERE number = ?")) {

@@ -51,8 +51,35 @@ public class BaseBank {
                     case 1:
                         System.out.println("Balance: " + account.getBalance());
                         break;
+                    case 2:
+                        System.out.println("Enter income:");
+                        int income = scanner.nextInt();
+                        dataBase.updateBalance(account.getCardNumber(), income);
+                        System.out.println("Income was added!");
+                        break;
+                    case 3:
+                        System.out.println("Transfer\n" +
+                                "Enter card number:");
+                        String cardNum = scanner.nextLine();
+                        if (!account.checkLuhnAlgorithm(cardNum)) {
+                            System.out.println("Probably you made mistake in the card number. Please try again!");
+                            break;
+                        }
+                        if (cardNum.equals(account.getCardNumber())) {
+                            System.out.println("You can't transfer money to the same account!");
+                            break;
+                        }
+                        System.out.println("Enter how much money you want to transfer:");
+                        int transfer = scanner.nextInt();
+                        if (transfer > account.getBalance()) {
+                            System.out.println("Not enough money!");
+                            break;
+                        }
+                        break;
                     case 4:
-
+                        System.out.println("The account has been closed!");
+                        dataBase.deleteCard(account.getCardNumber());
+                        break;
                     case 5:
                         System.out.println("You have successfully logged out!");
                         flag = false;
