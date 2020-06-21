@@ -60,7 +60,8 @@ public class BaseBank {
                     case 3:
                         System.out.println("Transfer\n" +
                                 "Enter card number:");
-                        String cardNum = scanner.nextLine();
+                        String cardNum = scanner.next();
+                        Account checkNumber = dataBase.findByNumber(cardNum);
                         if (!account.checkLuhnAlgorithm(cardNum)) {
                             System.out.println("Probably you made mistake in the card number. Please try again!");
                             break;
@@ -69,12 +70,19 @@ public class BaseBank {
                             System.out.println("You can't transfer money to the same account!");
                             break;
                         }
+                        if (checkNumber == null) {
+                            System.out.println("Such a card does not exist.");
+                            break;
+                        }
                         System.out.println("Enter how much money you want to transfer:");
                         int transfer = scanner.nextInt();
                         if (transfer > account.getBalance()) {
                             System.out.println("Not enough money!");
                             break;
                         }
+                        dataBase.updateBalance(account.getCardNumber(), -transfer);
+                        dataBase.updateBalance(checkNumber.getCardNumber(), transfer);
+                        System.out.println("Success!");
                         break;
                     case 4:
                         System.out.println("The account has been closed!");

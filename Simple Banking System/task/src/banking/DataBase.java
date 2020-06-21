@@ -4,7 +4,6 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 public class DataBase {
-    //String nameDataBase = "card.s3db";
     private final DataSource dataSource;
 
     public DataBase(DataSource dataSource) {
@@ -52,10 +51,16 @@ public class DataBase {
     }
 
     public void updateBalance(String cardNum, int income) {
+        String sql = "UPDATE card SET balance = ?"
+                + "WHERE number = ?";
+
         try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM card WHERE number=?")) {
-            pstmt.setString(1, cardNum);
-            pstmt.setInt(3, income);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // set the corresponding param
+            pstmt.setInt(1, income);
+            pstmt.setString(2, cardNum);
+            // update
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -63,13 +68,15 @@ public class DataBase {
     }
 
     public void deleteCard(String cardNum) {
-        try (final Connection connection = dataSource.getConnection();
-             final PreparedStatement stmt = connection.prepareStatement("DELETE FROM card WHERE number = ?")) {
+        String sql = "DELETE FROM card WHERE number = ?";
 
-            stmt.executeQuery();
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, cardNum);
+            pstmt.executeUpdate();
+
         } catch (SQLException e) {
-            System.out.println("Error reading from file");
-            throw new RuntimeException("Error while finding element");
+            System.out.println(e.getMessage());
         }
     }
 
